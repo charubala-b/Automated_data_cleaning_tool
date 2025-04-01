@@ -8,18 +8,12 @@ from cleaning import (
     convert_data_types
 )
 
-# **Function to Encode Image as Base64**
 def get_base64(img_path):
     with open(img_path, "rb") as file:
         return base64.b64encode(file.read()).decode()
 
-# Load background image
 img_data = get_base64("d1.webp")
 
-# **Custom CSS Styling**
-# background_style = """
-    
-# """
 
 st.markdown(f"""
     <style>
@@ -67,10 +61,8 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# **📌 Title**
 st.markdown("<h1>🧹 Data Cleaning Tool</h1>", unsafe_allow_html=True)
 
-# **📂 Sidebar - File Upload**
 st.sidebar.markdown("<div class='sidebar-text'>📂 Upload Datasets</div>", unsafe_allow_html=True)
 uploaded_files = st.sidebar.file_uploader("Upload one or more CSV/Excel files", type=["csv", "xlsx"], accept_multiple_files=True)
 
@@ -84,7 +76,6 @@ if uploaded_files:
             dfs.append(df)
 
     if len(dfs) > 1:
-        # **🔄 Merge Multiple Datasets**
         st.sidebar.markdown("<div class='sidebar-text'>🔄 Merge Options</div>", unsafe_allow_html=True)
         common_columns = list(set.intersection(*[set(df.columns) for df in dfs]))
 
@@ -103,23 +94,19 @@ if uploaded_files:
         df = dfs[0]
         st.success("✅ File uploaded successfully!")
 
-    # **📊 Show Raw Data**
     st.write("### Raw Data Preview")
     st.dataframe(df)
 
-    # **📊 Dataset Summary**
     with st.expander("📊 Dataset Summary"):
         st.write(df.describe())
 
-    # **🛠 Data Cleaning Options**
     st.sidebar.markdown("<div class='sidebar-text'>🛠 Data Cleaning Options</div>", unsafe_allow_html=True)
 
-    # **🗑 Remove Duplicates**
     if st.sidebar.checkbox("🗑 Remove Duplicates"):
         df = remove_duplicates(df)
         st.sidebar.success("✔️ Duplicates removed!")
 
-    # **⚠️ Handle Missing Values**
+
     missing_strategy = st.sidebar.radio("⚠️ Handle Missing Values", ["None", "Drop", "Fill with Value", "Mean", "Median"])
     if missing_strategy == "Fill with Value":
         fill_value = st.sidebar.text_input("Enter Fill Value", value="")
@@ -127,30 +114,25 @@ if uploaded_files:
     elif missing_strategy in ["Mean", "Median"]:
         df = handle_missing_values(df, strategy=missing_strategy.lower())
 
-    # **🔤 Standardize Column Names**
     if st.sidebar.checkbox("🔤 Standardize Column Names"):
         df = standardize_column_names(df)
 
-    # **📏 Normalize a Numerical Column**
     normalize_col = st.sidebar.selectbox("📏 Normalize Column", ["None"] + list(df.select_dtypes(include="number").columns), key="normalize_column")
     if normalize_col != "None":
         df = normalize_column(df, normalize_col)
 
-    # **📉 Remove Outliers**
     outlier_col = st.sidebar.selectbox("📉 Remove Outliers", ["None"] + list(df.select_dtypes(include="number").columns), key="outlier_column")
     outlier_method = st.sidebar.radio("⚖️ Outlier Removal Method", ["Z-score", "IQR"])
     if outlier_col != "None":
         df = remove_outliers(df, outlier_col, method=outlier_method.lower())
 
-    # **🔄 Convert Data Types**
     if st.sidebar.checkbox("🔄 Convert Data Types"):
         df = convert_data_types(df)
 
-    # **✨ Show Cleaned Data**
+
     st.write("### ✨ Cleaned Data Preview")
     st.dataframe(df)
 
-    # **📥 File Download Options**
     st.sidebar.markdown("<div class='sidebar-text'>📥 Export Cleaned Data</div>", unsafe_allow_html=True)
 
     def convert_df(df, file_type):
